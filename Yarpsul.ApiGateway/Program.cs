@@ -4,13 +4,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddEndpointsApiExplorer()
-    .AddInstanceIdProvider();
+    .AddInstanceIdProvider()
+    .AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy")); ;
 
 var app = builder.Build();
 
-app
-    .UseHttpsRedirection()
-    .UseInstanceIdResponseHeader();
+app.MapReverseProxy();
+
+app.UseHttpsRedirection();
 
 app.MapInstanceIdEndpoint("/", "API Gateway");
 
