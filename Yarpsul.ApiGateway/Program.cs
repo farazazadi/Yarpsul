@@ -1,9 +1,17 @@
+using Yarpsul.Shared.InstanceId;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
+builder.Services
+    .AddEndpointsApiExplorer()
+    .AddInstanceIdProvider();
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+app
+    .UseHttpsRedirection()
+    .UseInstanceIdResponseHeader();
+
+app.MapInstanceIdEndpoint("/", "API Gateway");
 
 app.Run();

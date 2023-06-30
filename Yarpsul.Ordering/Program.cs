@@ -1,7 +1,11 @@
+using Yarpsul.Shared.InstanceId;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen()
+    .AddInstanceIdProvider();
 
 var app = builder.Build();
 
@@ -11,6 +15,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app
+    .UseHttpsRedirection()
+    .UseInstanceIdResponseHeader();
+
+app.MapInstanceIdEndpoint("/","Ordering service");
 
 app.Run();
