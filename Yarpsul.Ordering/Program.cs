@@ -1,3 +1,4 @@
+using Yarpsul.Ordering.Orders;
 using Yarpsul.Shared.InstanceId;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,7 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
-    .AddInstanceIdProvider();
+    .AddInstanceIdProvider()
+    .AddSingleton<OrderService>();
 
 var app = builder.Build();
 
@@ -20,5 +22,15 @@ app
     .UseInstanceIdResponseHeader();
 
 app.MapInstanceIdEndpoint("/","Ordering service");
+
+app.MapGet("/api/orders", (OrderService service) => Results.Ok(service.GetAllOrders()));
+
+app.MapGet("/api/orders/{id:int}", (OrderService service, int id) =>
+{
+    Order? order = service.GetOrder(id);
+
+    return order is null ? Results.NotFound() : Results.Ok(order);
+});
+
 
 app.Run();
