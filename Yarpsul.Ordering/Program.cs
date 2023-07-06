@@ -1,5 +1,6 @@
 using Yarpsul.Ordering.Orders;
 using Yarpsul.Shared.InstanceId;
+using Yarpsul.Shared.ServiceRegistry.Consul;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,7 @@ builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
     .AddInstanceIdProvider()
+    .AddConsulServiceRegistrationBackgroundService()
     .AddSingleton<OrderService>();
 
 var app = builder.Build();
