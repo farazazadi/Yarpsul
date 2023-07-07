@@ -93,17 +93,17 @@ public class ConsulServiceRegistrationBackgroundService : BackgroundService
                 Address = appAddress.Host,
                 Port = appAddress.Port,
                 Tags = tags.ToArray(),
-             };
+                Meta = new Dictionary<string, string>
+                {
+                    { "Scheme", appAddress.Scheme }
+                }
+            };
 
             var healthEndpoint = _serviceRegistryConfiguration.HealthEndpoint;
 
             if (!string.IsNullOrWhiteSpace(healthEndpoint))
-            {
-                serviceRegistration.Meta = new Dictionary<string, string>
-                {
-                    { "HealthEndpoint", healthEndpoint }
-                };
-            }
+                serviceRegistration.Meta.Add("HealthEndpoint", healthEndpoint);
+
 
             try
             {
@@ -157,8 +157,8 @@ public class ConsulServiceRegistrationBackgroundService : BackgroundService
         var startedSource = new TaskCompletionSource();
         var cancelledSource = new TaskCompletionSource();
 
-        await using CancellationTokenRegistration reg1 = _applicationLifetime.ApplicationStarted.Register(() => startedSource.SetResult());
-        await using CancellationTokenRegistration reg2 = stoppingToken.Register(() => cancelledSource.SetResult());
+        using CancellationTokenRegistration reg1 = _applicationLifetime.ApplicationStarted.Register(() => startedSource.SetResult());
+        using CancellationTokenRegistration reg2 = stoppingToken.Register(() => cancelledSource.SetResult());
 
         Task completedTask = await Task.WhenAny(
                 startedSource.Task,

@@ -122,11 +122,18 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
                 var destinationName = agentService.ID;
 
                 var healsEndpointExist = agentService.Meta.TryGetValue("HealthEndpoint", out var healthEndpoint);
+                
+                var schemeExist = agentService.Meta.TryGetValue("Scheme", out var scheme);
+
+                if(!schemeExist)
+                    continue;
+
+                var address = $"{scheme}://{agentService.Address}:{agentService.Port}";
 
                 DestinationConfig destinationConfig = new()
                 {
-                    Address = defaultDestinationValue.Address.Replace($"[{placeholder}]", $"{agentService.Address}:{agentService.Port}"),
-                    Health = healsEndpointExist ? healthEndpoint : null,
+                    Address = defaultDestinationValue.Address.Replace($"[{placeholder}]", address),
+                    Health = healthEndpoint,
                     Metadata = defaultDestinationValue.Metadata
                 };
 
