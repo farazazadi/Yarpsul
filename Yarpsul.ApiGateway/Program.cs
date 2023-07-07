@@ -14,8 +14,6 @@ builder.Services.AddReverseProxy()
 var app = builder.Build();
 
 
-app.UseHttpsRedirection();
-
 app.MapInstanceIdEndpoint("/", "API Gateway");
 
 app.MapReverseProxy();

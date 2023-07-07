@@ -20,9 +20,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app
-    .UseHttpsRedirection()
-    .UseInstanceIdResponseHeader();
+app.UseInstanceIdResponseHeader();
 
 app.MapInstanceIdEndpoint("/", "Catalog service");
 
