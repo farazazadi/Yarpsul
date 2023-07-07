@@ -1,19 +1,23 @@
+using Yarpsul.ApiGateway.Yarp;
 using Yarpsul.Shared.InstanceId;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddEndpointsApiExplorer()
-    .AddInstanceIdProvider()
-    .AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy")); ;
+    .AddInstanceIdProvider();
+    
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
+    .DiscoverFromConsul();
 
 var app = builder.Build();
 
-app.MapReverseProxy();
 
 app.UseHttpsRedirection();
 
 app.MapInstanceIdEndpoint("/", "API Gateway");
+
+app.MapReverseProxy();
 
 app.Run();
