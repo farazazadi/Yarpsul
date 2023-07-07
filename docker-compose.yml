@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  consul:
+    image: consul:1.15.4
+    container_name: consul
+    restart: unless-stopped
+    ports:
+      - 8500:8500
+    networks:
+      - yarpsul
+    volumes:
+      - consul:/consul/data
+
+
+networks:
+  yarpsul:
+    name: yarpsul-network
+
+volumes:
+  consul:
+    driver: local
