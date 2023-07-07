@@ -1,4 +1,5 @@
 using Yarpsul.Ordering.Orders;
+using Yarpsul.Shared;
 using Yarpsul.Shared.InstanceId;
 using Yarpsul.Shared.ServiceRegistry.Consul;
 
@@ -25,13 +26,23 @@ app
 
 app.MapInstanceIdEndpoint("/","Ordering service");
 
-app.MapGet("/api/orders", (OrderService service) => Results.Ok(service.GetAllOrders()));
 
-app.MapGet("/api/orders/{id:int}", (OrderService service, int id) =>
+app.MapGet("/api/orders", (OrderService service, InstanceIdProvider instanceIdProvider) =>
+{
+    var result = WrappedResult<List<Order>>
+        .Create(service.GetAllOrders(), instanceIdProvider.InstanceId);
+
+    return Results.Ok(result);
+});
+
+
+app.MapGet("/api/orders/{id:int}", (OrderService service, InstanceIdProvider instanceIdProvider, int id) =>
 {
     Order? order = service.GetOrder(id);
 
-    return order is null ? Results.NotFound() : Results.Ok(order);
+    var result = WrappedResult<Order?>.Create(order, instanceIdProvider.InstanceId);
+
+    return order is null ? Results.NotFound() : Results.Ok(result);
 });
 
 

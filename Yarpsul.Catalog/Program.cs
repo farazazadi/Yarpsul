@@ -1,4 +1,5 @@
 using Yarpsul.Catalog.Products;
+using Yarpsul.Shared;
 using Yarpsul.Shared.InstanceId;
 using Yarpsul.Shared.ServiceRegistry.Consul;
 
@@ -26,14 +27,22 @@ app
 app.MapInstanceIdEndpoint("/", "Catalog service");
 
 
-app.MapGet("/api/products", (ProductService service) => Results.Ok(service.GetAllProducts()));
+app.MapGet("/api/products", (ProductService service, InstanceIdProvider instanceIdProvider) =>
+{
+    var result = WrappedResult<List<Product>>
+        .Create(service.GetAllProducts(), instanceIdProvider.InstanceId);
+
+    return Results.Ok(result);
+});
 
 
-app.MapGet("/api/products/{id:int}", (ProductService service, int id) =>
+app.MapGet("/api/products/{id:int}", (int id, ProductService service, InstanceIdProvider instanceIdProvider) =>
 {
     Product? product = service.GetProduct(id);
 
-    return product is null ? Results.NotFound() : Results.Ok(product);
+    var result = WrappedResult<Product?>.Create(product, instanceIdProvider.InstanceId);
+
+    return product is null ? Results.NotFound() : Results.Ok(result);
 });
 
 
